@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Hello</title>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/jquery.min.js"></script>
+<script>
+var user = null;
+
+function User(socket) {
+  var self = this;
+  var id = null;
+
+  self.send = function send(obj) {
+    if (!('msg' in obj) && typeof(obj.msg) == 'string' &&
+        obj.msg.length)
+      throw new Error('obj.msg must be a non-empty string');
+    socket.send(JSON.stringify(obj));
+  };
+
+  socket.on('message', function(data) {
+    data = JSON.parse(data);
+    switch (data.msg) {
+      case 'init':
+        id = data.id;
+        console.log("I AM", id);
+        break;
+      default:
+        console.warn("Unknown msg:", data.msg);
+        console.log(JSON.stringify(data));
+        break;
+    }
+  });
+}
+
+$(window).ready(function() {
+  var socket = new io.Socket(window.location.hostname);
+
+  socket.on('connect', function() {
+    user = new User(socket);
+  });
+  socket.on('disconnect', function() {
+    console.log("DISCONNECT");
+    user = null;
+  });
+  socket.connect();
+});
+</script>
+<style>
+body {
+  font-family: Futura;
+}
+</style>
+<h1>Kitchen Party</h1>
