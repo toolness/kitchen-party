@@ -12,19 +12,20 @@ var PUNCTUATION_MAP = {
 };
 
 function errorMessage(text) {
-  // TODO: Make this non-modal.
-  alert(text);
+  var msg = $('<div class="error"></div>');
+  msg.text(text);
+  addMessage(msg);
+}
+
+function addMessage(query) {
+  $("#messages").append(query);
+  var height = $(document.body).height();
+  $(document.body).scrollTop(height);
 }
 
 $(window).ready(function() {
   var socket = new io.Socket(window.location.hostname);
   var id = null;
-
-  function addMessage(query) {
-    $("#messages").append(query);
-    var height = $(document.body).height();
-    $(document.body).scrollTop(height);
-  }
   
   function send(obj) {
     socket.send(JSON.stringify(obj));
@@ -131,6 +132,10 @@ body {
   outline: none;
   font-family: inherit;
   font-size: inherit;
+}
+
+.error {
+  color: firebrick;
 }
 </style>
 <h1>Kitchen Party</h1>
