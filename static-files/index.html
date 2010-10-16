@@ -4,6 +4,13 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/jquery.min.js"></script>
 <script>
+var PUNCTUATION = /[.?!]$/;
+var PUNCTUATION_MAP = {
+  '.': 'say',
+  '!': 'exclaim',
+  '?': 'ask'
+};
+
 function errorMessage(text) {
   // TODO: Make this non-modal.
   alert(text);
@@ -29,7 +36,13 @@ $(window).ready(function() {
       $("#messages").append(init);      
     },
     say: function(options) {
-      var say = $("#templates .say").clone();
+      var match = options.content.match(PUNCTUATION);
+      var type = PUNCTUATION_MAP[match[0]];
+
+      if (!type)
+        throw new Error('unknown punctuation');
+
+      var say = $("#templates ." + type).clone();
       fillName(say, options.from);
       say.find(".content").text(options.content);
       $("#messages").append(say);
@@ -57,16 +70,25 @@ $(window).ready(function() {
   });
   socket.connect();
 
-  $("#prompt input").keyup(function(event) {
-    if (event.keyCode == 13) {
-      if (id === null) {
-        errorMessage('You are disconnected.');
-        return;
-      }
-      send({msg: 'say', content: $(this).val()});
-      $(this).val('');
+  $("#prompt form").submit(function(event) {
+    event.preventDefault();
+    var input = $(this).find("input");
+    var content = input.val();
+    if (!content)
+      return;
+    if (!content.match(PUNCTUATION)) {
+      errorMessage('Please use complete sentences.');
+      return;
     }
-  }).focus();
+    if (id === null) {
+      errorMessage('You are disconnected.');
+      return;
+    }
+    send({msg: 'say', content: content});
+    input.val('');
+  });
+  
+  $("#prompt input").focus();
 });
 </script>
 <style>
@@ -89,7 +111,7 @@ body {
 <div id="messages">
 </div>
 <div id="prompt">
-  &gt; <input type="text" id="user-input">
+  <form>&gt; <input type="text"></form>
 </div>
 <div id="templates">
   <div class="init">
@@ -103,5 +125,11 @@ body {
   </div>
   <div class="say">
     <span class="name"></span> says, “<span class="content"></span>”
+  </div>
+  <div class="exclaim">
+    <span class="name"></span> exclaims, “<span class="content"></span>”
+  </div>
+  <div class="ask">
+    <span class="name"></span> asks, “<span class="content"></span>”
   </div>
 </div>
