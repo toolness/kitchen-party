@@ -20,6 +20,12 @@ $(window).ready(function() {
   var socket = new io.Socket(window.location.hostname);
   var id = null;
 
+  function addMessage(query) {
+    $("#messages").append(query);
+    var height = $(document.body).height();
+    $(document.body).scrollTop(height);
+  }
+  
   function send(obj) {
     socket.send(JSON.stringify(obj));
   }
@@ -40,12 +46,12 @@ $(window).ready(function() {
       id = options.id;
       var init = $("#templates .init").clone();
       fillName(init, id, true);
-      $("#messages").append(init);
+      addMessage(init);
       
       options.users.forEach(function(userID) {
         var present = $("#templates .present").clone();
         fillName(present, userID);
-        $("#messages").append(present);
+        addMessage(present);
       });
     },
     say: function(options) {
@@ -65,17 +71,17 @@ $(window).ready(function() {
       var verb = $(verbSelector.join(' ')).clone();
       say.find(".verb").append(verb);
       say.find(".content").text(options.content);
-      $("#messages").append(say);
+      addMessage(say);
     },
     connect: function(options) {
       var connect = $("#templates .connect").clone();
       fillName(connect, options.id);
-      $("#messages").append(connect);
+      addMessage(connect);
     },
     disconnect: function(options) {
       var disconnect = $("#templates .disconnect").clone();
       fillName(disconnect, options.id);
-      $("#messages").append(disconnect);
+      addMessage(disconnect);
     }
   };
 
