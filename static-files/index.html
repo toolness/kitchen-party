@@ -4,50 +4,104 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/jquery.min.js"></script>
 <script>
-var user = null;
-
-function User(socket) {
-  var self = this;
-  var id = null;
-
-  self.send = function send(obj) {
-    if (!('msg' in obj) && typeof(obj.msg) == 'string' &&
-        obj.msg.length)
-      throw new Error('obj.msg must be a non-empty string');
-    socket.send(JSON.stringify(obj));
-  };
-
-  socket.on('message', function(data) {
-    data = JSON.parse(data);
-    switch (data.msg) {
-      case 'init':
-        id = data.id;
-        console.log("I AM", id);
-        break;
-      default:
-        console.warn("Unknown msg:", data.msg);
-        console.log(JSON.stringify(data));
-        break;
-    }
-  });
+function errorMessage(text) {
+  // TODO: Make this non-modal.
+  alert(text);
 }
 
 $(window).ready(function() {
   var socket = new io.Socket(window.location.hostname);
+  var id = null;
 
-  socket.on('connect', function() {
-    user = new User(socket);
+  function send(obj) {
+    socket.send(JSON.stringify(obj));
+  }
+
+  function fillName(query, id) {
+    query.find(".name").text("number " + id);    
+  }
+
+  var messageDelegate = {
+    init: function(options) {
+      id = options.id;
+      var init = $("#templates .init").clone();
+      fillName(init, id);
+      $("#messages").append(init);      
+    },
+    say: function(options) {
+      var say = $("#templates .say").clone();
+      fillName(say, options.from);
+      say.find(".content").text(options.content);
+      $("#messages").append(say);
+    },
+    connect: function(options) {
+      var connect = $("#templates .connect").clone();
+      fillName(connect, options.id);
+      $("#messages").append(connect);
+    },
+    disconnect: function(options) {
+      var disconnect = $("#templates .disconnect").clone();
+      fillName(disconnect, options.id);
+      $("#messages").append(disconnect);
+    }
+  };
+
+  //socket.on('connect', function() {});
+  socket.on('message', function(data) {
+    data = JSON.parse(data);
+    if (data.msg in messageDelegate)
+      messageDelegate[data.msg](data);
   });
   socket.on('disconnect', function() {
-    console.log("DISCONNECT");
-    user = null;
+    id = null;
   });
   socket.connect();
+
+  $("#prompt input").keyup(function(event) {
+    if (event.keyCode == 13) {
+      if (id === null) {
+        errorMessage('You are disconnected.');
+        return;
+      }
+      send({msg: 'say', content: $(this).val()});
+      $(this).val('');
+    }
+  }).focus();
 });
 </script>
 <style>
 body {
   font-family: Futura;
 }
+
+#templates {
+  display: none;
+}
+
+#prompt input {
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+}
 </style>
 <h1>Kitchen Party</h1>
+<div id="messages">
+</div>
+<div id="prompt">
+  &gt; <input type="text" id="user-input">
+</div>
+<div id="templates">
+  <div class="init">
+    You are now known as <span class="name"></span>.
+  </div>
+  <div class="connect">
+    <span class="name"></span> has joined the party.
+  </div>
+  <div class="disconnect">
+    <span class="name"></span> has left the party.
+  </div>
+  <div class="say">
+    <span class="name"></span> says, “<span class="content"></span>”
+  </div>
+</div>
