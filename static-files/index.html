@@ -24,17 +24,22 @@ $(window).ready(function() {
     socket.send(JSON.stringify(obj));
   }
 
-  function fillName(query, id) {
-    // TODO: If id is the same as the user's id, replace
-    // with 'you' and change verb as necessary.
-    query.find(".name").text("number " + id);
+  function fillName(query, userID, forceThirdPerson) {
+    var name;
+    if (userID == id && !forceThirdPerson)
+      name = $("#templates .you").clone();
+    else {
+      name = $("#templates .other").clone();
+      name.find(".user-id").text(userID.toString());
+    }
+    query.find(".name").append(name);
   }
 
   var messageDelegate = {
     init: function(options) {
       id = options.id;
       var init = $("#templates .init").clone();
-      fillName(init, id);
+      fillName(init, id, true);
       $("#messages").append(init);
       
       options.users.forEach(function(userID) {
@@ -50,8 +55,15 @@ $(window).ready(function() {
       if (!type)
         throw new Error('unknown punctuation');
 
-      var say = $("#templates ." + type).clone();
+      var say = $("#templates > .say").clone();
       fillName(say, options.from);
+      var verbSelector = ["#templates", ".verbs", "." + type];
+      if (options.from == id)
+        verbSelector.push(".plural");
+      else
+        verbSelector.push(".singular");
+      var verb = $(verbSelector.join(' ')).clone();
+      say.find(".verb").append(verb);
       say.find(".content").text(options.content);
       $("#messages").append(say);
     },
@@ -122,6 +134,8 @@ body {
   <form>&gt; <input type="text"></form>
 </div>
 <div id="templates">
+  <span class="you">you</span>
+  <span class="other">number <span class="user-id"></span></span>
   <div class="init">
     You are now known as <span class="name"></span>.
   </div>
@@ -135,12 +149,21 @@ body {
     <span class="name"></span> has left the party.
   </div>
   <div class="say">
-    <span class="name"></span> says, “<span class="content"></span>”
+    <span class="name"></span>
+    <span class="verb"></span>, “<span class="content"></span>”
   </div>
-  <div class="exclaim">
-    <span class="name"></span> exclaims, “<span class="content"></span>”
-  </div>
-  <div class="ask">
-    <span class="name"></span> asks, “<span class="content"></span>”
+  <div class="verbs">
+    <div class="say">
+      <span class="singular">says</span>
+      <span class="plural">say</span>
+    </div>
+    <div class="exclaim">
+      <span class="singular">exclaims</span>
+      <span class="plural">exclaim</span>
+    </div>
+    <div class="ask">
+      <span class="singular">asks</span>
+      <span class="plural">ask</span>
+    </div>
   </div>
 </div>
