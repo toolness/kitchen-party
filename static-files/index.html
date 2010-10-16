@@ -11,9 +11,9 @@ var PUNCTUATION_MAP = {
   '?': 'ask'
 };
 
-function errorMessage(text) {
+function errorMessage(class) {
   var msg = $('<div class="error"></div>');
-  msg.text(text);
+  msg.append($('#templates .errors .' + class).clone());
   addMessage(msg);
 }
 
@@ -104,11 +104,11 @@ $(window).ready(function() {
     if (!content)
       return;
     if (!content.match(PUNCTUATION)) {
-      errorMessage('Please use complete sentences.');
+      errorMessage('bad-grammar');
       return;
     }
     if (id === null) {
-      errorMessage('You are disconnected.');
+      errorMessage('disconnected');
       return;
     }
     send({msg: 'say', content: content});
@@ -147,6 +147,10 @@ body {
 <div id="templates">
   <span class="you">you</span>
   <span class="other">number <span class="user-id"></span></span>
+  <div class="errors">
+    <div class="bad-grammar">Please use complete sentences.</div>
+    <div class="disconnected">You are disconnected.</div>
+  </div>
   <div class="init">
     You are now known as <span class="name"></span>.
   </div>
