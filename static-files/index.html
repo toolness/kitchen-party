@@ -25,7 +25,9 @@ $(window).ready(function() {
   }
 
   function fillName(query, id) {
-    query.find(".name").text("number " + id);    
+    // TODO: If id is the same as the user's id, replace
+    // with 'you' and change verb as necessary.
+    query.find(".name").text("number " + id);
   }
 
   var messageDelegate = {
@@ -33,7 +35,13 @@ $(window).ready(function() {
       id = options.id;
       var init = $("#templates .init").clone();
       fillName(init, id);
-      $("#messages").append(init);      
+      $("#messages").append(init);
+      
+      options.users.forEach(function(userID) {
+        var present = $("#templates .present").clone();
+        fillName(present, userID);
+        $("#messages").append(present);
+      });
     },
     say: function(options) {
       var match = options.content.match(PUNCTUATION);
@@ -116,6 +124,9 @@ body {
 <div id="templates">
   <div class="init">
     You are now known as <span class="name"></span>.
+  </div>
+  <div class="present">
+    <span class="name"></span> is here.
   </div>
   <div class="connect">
     <span class="name"></span> has joined the party.

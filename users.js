@@ -5,7 +5,11 @@ function User(users, id, client) {
     client.send(JSON.stringify(obj));
   };
 
-  self.send({msg: 'init', id: id});
+  self.send({
+    msg: 'init',
+    id: id,
+    users: users.get()
+  });
 
   client.on('message', function(data) {
     data = JSON.parse(data);
@@ -52,6 +56,13 @@ function Users() {
   self.broadcast = function(obj) {
     for (var id in users)
       users[id].send(obj);
+  };
+  
+  self.get = function() {
+    var array = [];
+    for (var id in users)
+      array.push(id);
+    return array;
   };
 }
 
