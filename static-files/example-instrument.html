@@ -6,10 +6,10 @@
 onload = function() {
   KitchenParty.createInstrument(function(channel) {
     channel.on('setState', function(state) {
-      if (state.letters)
-        for (var i = 0; i < state.letters.length; i++)
+      if (state.s && typeof(state.s) == 'string')
+        for (var i = 0; i < state.s.length; i++)
           if (letters[i])
-            letters[i].set(state.letters[i]);
+            letters[i].set(state.s[i] == '1' ? true : false);
     });
 
     channel.setSize(100, 100);
@@ -18,9 +18,9 @@ onload = function() {
     var letters = [];
   
     function pushState() {
-      var newState = {letters: []};
+      var newState = {s: ''};
       letters.forEach(function(letter) {
-        newState.letters.push(letter.get()); 
+        newState.s += letter.get() ? '1' : '0';
       });
       channel.setState(newState, true);
     }
