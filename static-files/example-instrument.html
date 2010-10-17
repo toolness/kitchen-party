@@ -3,51 +3,62 @@
 <title>Example Instrument</title>
 <script src="/kitchen-party.js"></script>
 <script>
+function Letter(letter, onStateChange) {
+  var span = document.createElement('span');
+  span.className = 'unselected';
+  span.textContent = letter;
+  span.addEventListener('mouseover', this, false);
+  span.addEventListener('mouseout', this, false);
+
+  this.span = span;
+  this.onStateChange = onStateChange;
+}
+
+Letter.prototype = {
+  handleEvent: function handleEvent(event) {
+    this.set(event.type == 'mouseover' ? true : false);
+    this.onStateChange();
+  },
+  set: function set(status) {
+    this.span.className = status ? 'selected' : 'unselected';
+  },
+  get: function get() {
+    return this.span.className == 'selected';
+  }
+};
+
+function makeLetters(text, onStateChange) {
+  var letters = [];
+  var string = document.getElementById('string');
+
+  text.split('').forEach(function(character) {
+    var letter = new Letter(character, onStateChange);
+    string.appendChild(letter.span);
+    letters.push(letter);
+  });
+
+  return letters;
+}
+
 onload = function() {
+  var TEXT = 'html5 is cool.';
+
   KitchenParty.createInstrument(function(channel) {
-    channel.on('setState', function(state) {
-      if (state.s && typeof(state.s) == 'string')
-        for (var i = 0; i < state.s.length; i++)
-          if (letters[i])
-            letters[i].set(state.s[i] == '1' ? true : false);
-    });
-
-    channel.setSize(100, 100);
-
-    var string = document.getElementById('string');
-    var letters = [];
-  
-    function pushState() {
+    var letters = makeLetters(TEXT, function onStateChange() {
       var newState = {s: ''};
       letters.forEach(function(letter) {
         newState.s += letter.get() ? '1' : '0';
       });
-      channel.setState(newState, true);
-    }
-
-    'html5 is cool.'.split('').forEach(function(letter) {
-      var self = {
-        set: function set(status) {
-          span.className = status ? 'selected' : 'unselected';
-        },
-        get: function get() {
-          return (span.className == 'selected');
-        }
-      };
-      var span = document.createElement('span');
-      span.className = 'unselected';
-      span.textContent = letter;
-      span.addEventListener('mouseover', function() {
-        self.set(true);
-        pushState();
-      }, false);
-      span.addEventListener('mouseout', function() {
-        self.set(false);
-        pushState();
-      }, false);
-      string.appendChild(span);
-      letters.push(self);
+      channel.setState(newState, true);      
     });
+
+    channel.on('setState', function(state) {
+      if (state.s)
+        for (var i = 0; i < state.s.length; i++)
+          letters[i].set(state.s[i] == '1' ? true : false);
+    });
+
+    channel.setSize(100, 100);
   });
 };
 </script>
