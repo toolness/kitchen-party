@@ -1,15 +1,22 @@
 ;KitchenParty = (function() {
   var KitchenParty = {
     createInstrument: function(cb, partyWindow) {
+      partyWindow = partyWindow || window.parent;
+
+      if (!partyWindow || partyWindow == window) {
+        cb(true, null);
+        return;
+      }
+
       function makeChannel() {
         var channel = window.Channel.build({
-          window: partyWindow || window.parent,
+          window: partyWindow,
           // TODO: Use the current origin of partyWindow?
           origin: '*',
           scope: 'kitchen-party-instrument'
         });
 
-        cb(new InstrumentChannel(channel));
+        cb(false, new InstrumentChannel(channel));
       }
 
       if (window.Channel)

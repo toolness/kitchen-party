@@ -43,14 +43,18 @@ function makeLetters(text, onStateChange) {
 onload = function() {
   var TEXT = 'html5 is cool.';
 
-  KitchenParty.createInstrument(function(channel) {
+  KitchenParty.createInstrument(function(err, channel) {
     var letters = makeLetters(TEXT, function onStateChange() {
       var newState = {s: ''};
       letters.forEach(function(letter) {
         newState.s += letter.get() ? '1' : '0';
       });
-      channel.setState(newState, true);      
+      if (channel)
+        channel.setState(newState, true);      
     });
+
+    if (err)
+      return;
 
     channel.on('setState', function(state) {
       if (state.s)
