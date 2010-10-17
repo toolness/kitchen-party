@@ -92,8 +92,10 @@
   function loadScriptInMyDir(filename, cb) {
     var ME = /kitchen-party.js$/;
     
-    for (var i = 0; i < document.scripts.length; i++) {
-      var script = document.scripts[i];
+    var scripts = document.querySelectorAll("script");
+    
+    for (var i = 0; i < scripts.length; i++) {
+      var script = scripts[i];
       if (script.src.match(ME)) {
         var newScript = document.createElement('script');
         newScript.setAttribute('src', script.src.replace(ME, filename));
