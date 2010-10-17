@@ -3,51 +3,53 @@
 <title>Example Instrument</title>
 <script src="/kitchen-party.js"></script>
 <script>
-KitchenParty.createInstrument(function(channel) {
-  channel.on('setState', function(state) {
-    if (state.letters)
-      for (var i = 0; i < state.letters.length; i++)
-        if (letters[i])
-          letters[i].set(state.letters[i]);
-  });
-
-  channel.setSize(100, 100);
-
-  var string = document.getElementById('string');
-  var letters = [];
-
-  function pushState() {
-    var newState = {letters: []};
-    letters.forEach(function(letter) {
-      newState.letters.push(letter.get()); 
+onload = function() {
+  KitchenParty.createInstrument(function(channel) {
+    channel.on('setState', function(state) {
+      if (state.letters)
+        for (var i = 0; i < state.letters.length; i++)
+          if (letters[i])
+            letters[i].set(state.letters[i]);
     });
-    channel.setState(newState, true);
-  }
 
-  'html5 is cool.'.split('').forEach(function(letter) {
-    var self = {
-      set: function set(status) {
-        span.className = status ? 'selected' : 'unselected';
-      },
-      get: function get() {
-        return (span.className == 'selected');
-      }
-    };
-    var span = document.createElement('span');
-    span.className = 'unselected';
-    span.textContent = letter;
-    span.addEventListener('mouseover', function() {
-      self.set(true);
-      pushState();
-    }, false);
-    span.addEventListener('mouseout', function() {
-      self.set(false);
-      pushState();
-    }, false);
-    string.appendChild(span);
-    letters.push(self);
+    channel.setSize(100, 100);
+
+    var string = document.getElementById('string');
+    var letters = [];
+  
+    function pushState() {
+      var newState = {letters: []};
+      letters.forEach(function(letter) {
+        newState.letters.push(letter.get()); 
+      });
+      channel.setState(newState, true);
+    }
+
+    'html5 is cool.'.split('').forEach(function(letter) {
+      var self = {
+        set: function set(status) {
+          span.className = status ? 'selected' : 'unselected';
+        },
+        get: function get() {
+          return (span.className == 'selected');
+        }
+      };
+      var span = document.createElement('span');
+      span.className = 'unselected';
+      span.textContent = letter;
+      span.addEventListener('mouseover', function() {
+        self.set(true);
+        pushState();
+      }, false);
+      span.addEventListener('mouseout', function() {
+        self.set(false);
+        pushState();
+      }, false);
+      string.appendChild(span);
+      letters.push(self);
+    });
   });
-});
+};
 </script>
 <style>
 body {
