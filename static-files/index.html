@@ -25,7 +25,7 @@ function addMessage(query) {
   $(document.body).scrollTop(height);
 }
 
-function Instrument(id, url, state, send) {
+function Instrument(where, id, url, state, send) {
   var self = this;
   var iframe = document.createElement('iframe');
 
@@ -35,7 +35,7 @@ function Instrument(id, url, state, send) {
 
   iframe.src = url;
   iframe.setAttribute("scrolling", "no");
-  $("#instruments").append(iframe);
+  $(where).append(iframe);
 
   var channel = Channel.build({
     window: iframe.contentWindow,
@@ -102,8 +102,8 @@ function Instruments() {
   var self = this;
   var instruments = {};
 
-  self.add = function(id, url, state, send) {
-    instruments[id] = new Instrument(id, url, state, send);
+  self.add = function(where, id, url, state, send) {
+    instruments[id] = new Instrument(where, id, url, state, send);
   };
   
   self.remove = function(id) {
@@ -146,12 +146,22 @@ $(window).ready(function() {
     query.find(".name").append(name);
   }
 
+  function addInstrument(options) {
+    var instrument = $("#templates .instrument").clone();
+    instrument.attr("id", "instrument-" + options.id);
+    $("#instruments").append(instrument);
+    instrument.find(".controls .close").click(function() {
+      commandDelegate.remove(options.id);
+    });
+    instruments.add(instrument.find(".content"),
+                    options.id, options.url, options.state, send);
+  }
+
   var messageDelegate = {
-    'instrument:add': function(options) {
-      instruments.add(options.id, options.url, options.state, send);
-    },
+    'instrument:add': addInstrument,
     'instrument:remove': function(options) {
       instruments.remove(options.id);
+      $("#instrument-" + options.id).remove();
     },
     'instrument:message': function(options) {
       instruments.get(options.id).message(options.content);
@@ -171,9 +181,7 @@ $(window).ready(function() {
         addMessage(present);
       });
       
-      options.instruments.forEach(function(options) {
-        instruments.add(options.id, options.url, options.state, send);
-      });
+      options.instruments.forEach(addInstrument);
     },
     say: function(options) {
       var match = options.content.match(PUNCTUATION);
@@ -240,6 +248,18 @@ $(window).ready(function() {
     }
   };
 
+  document.body.ondragover = function(event) {
+    event.preventDefault();
+  };
+
+  document.body.ondrop = function(event) {
+    var url = event.dataTransfer.getData('text/uri-list');
+    if (url) {
+      event.preventDefault();
+      commandDelegate.add(url);
+    }
+  };
+
   $("#prompt form").submit(function(event) {
     event.preventDefault();
     var input = $(this).find("input");
@@ -293,8 +313,24 @@ body {
   color: firebrick;
 }
 
-#instruments iframe {
+.instrument iframe {
   border: none;
+}
+
+.instrument .controls {
+  opacity: 0;
+}
+
+.instrument div.controls:hover {
+  opacity: 1;
+}
+
+.instrument .controls span {
+  cursor: pointer;
+}
+
+.instrument .controls span.close:before {
+  content: 'x';
 }
 
 pre {
@@ -310,6 +346,10 @@ pre {
 </div>
 <div id="instruments"></div>
 <div id="templates">
+  <div class="instrument">
+    <div class="content"></div>
+    <div class="controls"><span class="close"></span></div>
+  </div>
   <span class="you">you</span>
   <span class="other">number <span class="user-id"></span></span>
   <div class="errors">
