@@ -44,7 +44,7 @@ function Instrument(id, url, state, send) {
     scope: 'kitchen-party-instrument',
   });
 
-  channel.bind('instrument:message', function(content) {
+  channel.bind('instrument:message', function(t, content) {
     send({
       msg: 'instrument:message',
       id: id,
@@ -52,26 +52,26 @@ function Instrument(id, url, state, send) {
     });
   });
 
-  channel.bind('instrument:setState', function(state, broadcast) {
+  channel.bind('instrument:setState', function(t, options) {
     send({
       msg: 'instrument:setState',
       id: id,
-      state: state,
-      broadcast: broadcast
+      state: options.state,
+      broadcast: options.broadcast
     });
   });
 
-  channel.bind('instrument:setSize', function(width, height) {
-    iframe.width = width;
-    iframe.height = height;
+  channel.bind('instrument:setSize', function(t, options) {
+    iframe.width = options.width;
+    iframe.height = options.height;
   });
 
   self.url = url;
 
   self.message = function(content) {
-    channel.call({
+    channel.notify({
       method: 'instrument:message',
-      params: [content],
+      params: content,
       success: function() {},
       error: function() {
         console.error('instrument:message failed');
@@ -80,7 +80,7 @@ function Instrument(id, url, state, send) {
   };
 
   self.setState = function(state) {
-    channel.call({
+    channel.notify({
       method: 'instrument:setState',
       params: state,
       success: function() {},

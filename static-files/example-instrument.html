@@ -1,36 +1,25 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<meta name="author" content="Atul Varma">
 <title>Example Instrument</title>
-<!-- Date: 2010-10-16 -->
-<script src="/jschannel.js"></script>
+<script src="/kitchen-party.js"></script>
 <script>
-var channel = Channel.build({
-  window: window.parent,
-  origin: '*',
-  scope: 'kitchen-party-instrument'
-});
-
-channel.bind('instrument:message', function(content) {
-  console.log("example instrument:message", content);
-});
-
-channel.bind('instrument:setState', function(state) {
-  console.log("example instrument:setState", state);
-  channel.call({
-    method: 'instrument:message',
-    params: [{oof: 'hi'}],
-    success: function() {},
-    error: function() {
-      console.error("example instrument:message failed.");
-    }
+KitchenParty.createInstrument(function(channel) {
+  channel.on('message', function(msg) {
+    console.log("YAY MESSAGE", msg);
   });
-});
 
-channel.call({
-  method: 'instrument:setSize',
-  params: [100, 100],
-  success: function() {}
+  channel.on('setState', function(state) {
+    console.log("YAY STATE", state);
+    this.send("o hello.");
+  });
+
+  channel.setSize(100, 100);
 });
 </script>
+<style>
+body {
+  background: #f0f0f0;
+  font-family: Helvetica, sans-serif;
+}
+</style>
 <p>html5 is cool.</p>

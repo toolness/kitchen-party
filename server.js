@@ -10,6 +10,7 @@ var STATIC_FILES = {
   '/index.html': 'text/html'
 , '/jquery.min.js': 'application/javascript'
 , '/jschannel.js': 'application/javascript'
+, '/kitchen-party.js': 'application/javascript'
 , '/example-instrument.html': 'text/html'
 };
 
