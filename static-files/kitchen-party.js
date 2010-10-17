@@ -96,8 +96,7 @@
       var script = document.scripts[i];
       if (script.src.match(ME)) {
         var newScript = document.createElement('script');
-        newScript.baseURI = script.src;
-        newScript.setAttribute('src', filename);
+        newScript.setAttribute('src', script.src.replace(ME, filename));
         newScript.addEventListener('load', cb, false);
         document.documentElement.appendChild(newScript);
         return;
