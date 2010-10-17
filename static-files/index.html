@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<title>Hello</title>
+<title>Kitchen Party</title>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/jschannel.js"></script>
 <script src="/jquery.min.js"></script>
 <script>
+var COMMAND = /^\/([A-Za-z]+)(\s+(.*))?/;
 var PUNCTUATION = /[.?!]$/;
 var PUNCTUATION_MAP = {
   '.': 'say',
@@ -23,10 +25,112 @@ function addMessage(query) {
   $(document.body).scrollTop(height);
 }
 
+function Instrument(id, url, state, send) {
+  var self = this;
+  var iframe = document.createElement('iframe');
+
+  // TODO: Outlaw other URLs? file:?
+  if (url.match(/^javascript/i))
+    throw new Error("unsafe URL: " + url);
+
+  iframe.src = url;
+  iframe.setAttribute("scrolling", "no");
+  $("#instruments").append(iframe);
+
+  var channel = Channel.build({
+    window: iframe.contentWindow,
+    // TODO: Only accept messages from original origin.
+    origin: '*',
+    scope: 'kitchen-party-instrument',
+  });
+
+  channel.bind('instrument:message', function(content) {
+    send({
+      msg: 'instrument:message',
+      id: id,
+      content: content
+    });
+  });
+
+  channel.bind('instrument:setState', function(state, broadcast) {
+    send({
+      msg: 'instrument:setState',
+      id: id,
+      state: state,
+      broadcast: broadcast
+    });
+  });
+
+  channel.bind('instrument:setSize', function(width, height) {
+    iframe.width = width;
+    iframe.height = height;
+  });
+
+  self.url = url;
+
+  self.message = function(content) {
+    channel.call({
+      method: 'instrument:message',
+      params: [content],
+      success: function() {},
+      error: function() {
+        console.error('instrument:message failed');
+      }
+    });
+  };
+
+  self.setState = function(state) {
+    channel.call({
+      method: 'instrument:setState',
+      params: state,
+      success: function() {},
+      error: function() {
+        console.log("instrument:setState failed");
+      }
+    });
+  }
+
+  self.remove = function() {
+    $(iframe).remove();
+  };
+  
+  self.setState(state);
+  state = null;
+}
+
+function Instruments() {
+  var self = this;
+  var instruments = {};
+
+  self.add = function(id, url, state, send) {
+    instruments[id] = new Instrument(id, url, state, send);
+  };
+  
+  self.remove = function(id) {
+    instruments[id].remove();
+    delete instruments[id];
+  };
+  
+  self.get = function(id) {
+    return instruments[id];
+  };
+
+  self.getInfo = function() {
+    var info = [];
+    for (var id in instruments)
+      info.push({
+        id: id,
+        url: instruments[id].url
+      });
+    return info;
+  };
+}
+
 $(window).ready(function() {
   var socket = new io.Socket(window.location.hostname);
+  var instruments = new Instruments();
   var id = null;
-  
+
   function send(obj) {
     socket.send(JSON.stringify(obj));
   }
@@ -43,6 +147,18 @@ $(window).ready(function() {
   }
 
   var messageDelegate = {
+    'instrument:add': function(options) {
+      instruments.add(options.id, options.url, options.state, send);
+    },
+    'instrument:remove': function(options) {
+      instruments.remove(options.id);
+    },
+    'instrument:message': function(options) {
+      instruments.get(options.id).message(options.content);
+    },
+    'instrument:setState': function(options) {
+      instruments.get(options.id).setState(options.state);
+    },
     init: function(options) {
       id = options.id;
       var init = $("#templates .init").clone();
@@ -53,6 +169,10 @@ $(window).ready(function() {
         var present = $("#templates .present").clone();
         fillName(present, userID);
         addMessage(present);
+      });
+      
+      options.instruments.forEach(function(options) {
+        instruments.add(options.id, options.url, options.state, send);
       });
     },
     say: function(options) {
@@ -97,12 +217,46 @@ $(window).ready(function() {
   });
   socket.connect();
 
+  var commandDelegate = {
+    add: function(url) {
+      send({
+        msg: 'instrument:add',
+        url: url,
+        state: {}
+      });
+    },
+    remove: function(id) {
+      send({
+        msg: 'instrument:remove',
+        id: parseInt(id)
+      });
+    },
+    instruments: function() {
+      instruments.getInfo().forEach(function(info) {
+        var msg = $('<pre></pre>');
+        msg.text('instrument #' + info.id + ' @ ' + info.url);
+        addMessage(msg);
+      });
+    }
+  };
+
   $("#prompt form").submit(function(event) {
     event.preventDefault();
     var input = $(this).find("input");
     var content = input.val();
     if (!content)
       return;
+    var cmdMatch = content.match(COMMAND);
+    if (cmdMatch) {
+      var cmdName = cmdMatch[1];
+      var cmdArg = cmdMatch[3];
+      if (cmdName in commandDelegate) {
+        commandDelegate[cmdName](cmdArg);
+        input.val('');
+      } else
+        errorMessage('unknown-command');
+      return;
+    }
     if (!content.match(PUNCTUATION)) {
       errorMessage('bad-grammar');
       return;
@@ -132,10 +286,20 @@ body {
   outline: none;
   font-family: inherit;
   font-size: inherit;
+  width: 90%;
 }
 
 .error {
   color: firebrick;
+}
+
+#instruments iframe {
+  border: none;
+}
+
+pre {
+  font-family: Monaco, "Lucida Console", monospace;
+  font-size: 9pt;
 }
 </style>
 <h1>Kitchen Party</h1>
@@ -144,10 +308,12 @@ body {
 <div id="prompt">
   <form>&gt; <input type="text"></form>
 </div>
+<div id="instruments"></div>
 <div id="templates">
   <span class="you">you</span>
   <span class="other">number <span class="user-id"></span></span>
   <div class="errors">
+    <div class="unknown-command">Unknown command.</div>
     <div class="bad-grammar">Please use complete sentences.</div>
     <div class="disconnected">You are disconnected.</div>
   </div>

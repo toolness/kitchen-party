@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="author" content="Atul Varma">
+<title>Example Instrument</title>
+<!-- Date: 2010-10-16 -->
+<script src="/jschannel.js"></script>
+<script>
+var channel = Channel.build({
+  window: window.parent,
+  origin: '*',
+  scope: 'kitchen-party-instrument'
+});
+
+channel.bind('instrument:message', function(content) {
+  console.log("example instrument:message", content);
+});
+
+channel.bind('instrument:setState', function(state) {
+  console.log("example instrument:setState", state);
+  channel.call({
+    method: 'instrument:message',
+    params: [{oof: 'hi'}],
+    success: function() {},
+    error: function() {
+      console.error("example instrument:message failed.");
+    }
+  });
+});
+
+channel.call({
+  method: 'instrument:setSize',
+  params: [100, 100],
+  success: function() {}
+});
+</script>
+<p>html5 is cool.</p>

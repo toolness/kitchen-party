@@ -9,6 +9,8 @@ var INDEX_FILE = '/index.html';
 var STATIC_FILES = {
   '/index.html': 'text/html'
 , '/jquery.min.js': 'application/javascript'
+, '/jschannel.js': 'application/javascript'
+, '/example-instrument.html': 'text/html'
 };
 
 var server = http.createServer(function(req, res) {
