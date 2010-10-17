@@ -13,9 +13,9 @@ var PUNCTUATION_MAP = {
   '?': 'ask'
 };
 
-function errorMessage(class) {
+function errorMessage(className) {
   var msg = $('<div class="error"></div>');
-  msg.append($('#templates .errors .' + class).clone());
+  msg.append($('#templates .errors .' + className).clone());
   addMessage(msg);
 }
 
