@@ -11,7 +11,8 @@ var STATIC_FILES = {
 , '/jquery.min.js': 'application/javascript'
 , '/jschannel.js': 'application/javascript'
 , '/kitchen-party.js': 'application/javascript'
-, '/example-instrument.html': 'text/html'
+, '/examples/highlight.html': 'text/html'
+, '/examples/slideshow.html': 'text/html'
 };
 
 var server = http.createServer(function(req, res) {

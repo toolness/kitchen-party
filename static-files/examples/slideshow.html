@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+  <base href="http://toolness.github.com/community-engagement-slides/">
+  <title></title>
+  <link rel="stylesheet" href="screen.css">
+  <script src="slides.js"></script>
+
+  <script src="http://github.com/toolness/kitchen-party/raw/master/static-files/kitchen-party.js"></script>
+  <script>
+    KitchenParty.createInstrument(function(err, channel) {
+        if (!err) {
+            window.addEventListener('hashchange', function() {
+                channel.setState(window.location.hash, true);
+            }, false);
+            channel.on('setState', function(state) {
+                if (typeof(state) == "string" && window.location.hash != state)
+                  window.location.hash = state;
+            });
+            channel.setSize(800, 600);    
+        }
+    });
+  </script>
+
+  <div class="title slide">
+    <div class="content">
+      <div class="header">Mozilla Community Marketing Call</div>
+      <div class="subheader">August 11, 2010</div>
+    </div>
+    <div class="footer">&copy; 2010, Mozilla</div>
+  </div>
+  
+  <div class="normal slide">
+    <div class="content">
+      <div class="header">Agenda</div>
+      <div class="main">
+      <ul>
+      <li><h1>Thunderbird Contacts</h1></li>
+      <li><h1>Student Reps Orientation</h1></li>
+      <li><h1>Community Spotlight Submissions</h1></li>
+      <li><h1>Firefox 4</h1></li>
+      </ul>
+      </div>
+      </div>
+    </div>
+  </div>
+
+ <div class="normal slide">
+    <div class="content">
+      <div class="header">Thunderbird Contacts Add-on</div>
+      <div class="subheader"><a href="http://mozillalabs.com/messaging/thunderbird-contacts/">mozillalabs.com/messaging/thunderbird-contacts</a></div>
+      <div class="main">
+        <p>Contacts is an experiment with a new look on how the  Thunderbird address book could evolve.  Born from the Mozilla Labs  Contacts in Firefox add-on, Thunderbird Contacts was adapted to work in  Thunderbird and includes some new features. </p>
+<center><img style="height: 15em;" src="http://labs-newdomain.stage.mozilla.com/wp-content/themes/labs_project/img/contacts-header.png"></center>
+<p>Thunderbird  Contacts lets you pull in your “web contacts” from sites like LinkedIn,  Facebook, and Twitter.  It also lets you connect to your  mail contacts  inside of Yahoo or GMail.  As each contact is extracted  from a site,  the Contacts add-on tries to merge the contacts from  different sites  together into a single contact on your system.</p>
+
+       <h2><p>Learn more:  <a href="http://mozillalabs.com/messaging/thunderbird-contacts/">http://mozillalabs.com/messaging/thunderbird-contacts/</a></p></h2>
+      </div>
+    </div>
+  </div>
+  
+
+  
+   <div class="normal slide">
+    <div class="content">
+      <div class="header">Student Reps Orientation Week</div>
+      <div class="main">
+      <ul>
+      <li><h3>October 4-8th</h3></li>
+      <li><h3>Help you getting started  for the Fall 2010</h3></li>
+      <li><h3>Regional Meetups</h3></li>
+      <li><h3>Live talks and interactive sessions</h3></li>
+      <li><h3>Wiki Page coming up!</h3></li>
+      </ul>
+      </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="normal slide">
+    <div class="content">
+      <div class="header">Community Spotlight</div>
+      <div class="main">
+        <h2>Our community does great things all the time and we like to   highlight  individual and group contributions to Mozilla.</h2>
+        <h2>We’d like to feature community members like yourself on   various  Mozilla  outlets such as Spread Firefox, our Facebook group,   our twitter  stream  and more!</h2>
+      <h2>Share your contribution: <a href="http://moz.spotlight.sgizmo.com/">http://moz.spotlight.sgizmo.com/</a></h2>
+      </div>
+    </div>
+  </div>
+  
+<div class="normal slide">
+    <div class="content">
+      <div class="header">Firefox 4 </div>
+      
+      <div class="main">
+     <h2> Where are we now? </h2>
+     <h3> 380K ADUs, we want to have between 2-4 M ADUs before launch </h3>
+         <h3> This is what a current Beta user looks like: </h3>
+     <ul>
+     <li> More than 85% of beta users have used Firefox for more than 3 years </li>
+     <li> More than 70% of users are between 18-35 </li>
+           <li> Nearly 96% of Beta users are male</li>
+            <li>Nearly 50% of Beta users use the internet between 2-6 hours a day</li>
+          <li> 70% of users describe their skill level as an 8-10 on a 10 point scale. </li>
+            <li> 70% of users use more than one browser in daily life</li>
+            <li>Almost 70% of those that use more than one browser identify Firefox as their primary browser</li>
+            <li> Most people use the internet for entertainment and communication</li>
+            <li> Search, News, Social Networking, Webmail are the main types of sites beta users go to </li>
+            <li> Most people find out about latest news from online news sources and online blogs </li>
+            <li> Most users use  en-US, de, es*, fr, ru or pt-BR locales</li>
+            </ul>
+   <h2> New Campaign for the Beta </h2>
+   <ul>
+   <li> New campaign in the works, focusing on SEM, website partnerships, and Affiliates </li>
+    <li> Based on Text Links to spread Firefox--Top 50-100 Affiliates  get Beta shirts and entered to win a Prize drawing </li>
+   <li> <a href="http://www.spreadfirefox.com/affiliates">Affiliates on SFX</a></li>
+   <li>Any websites you think we should target? </li>
+   <li>Send your ideas to lmesa@mozilla.com </li>
+   </ul>
+   
+     <h2> Firefox 4: Got any great ideas? </h2>
+    <ul>
+    <li> We're starting to come up with our plan for the general Firefox 4 Release</li>
+    <li> We need MORE ideas! Send us all your campaign ideas --nothing is too big or too crazy</li>
+    <li> Send your ideas to lmesa@mozilla.com </li>
+    </ul>
+  </div>
+  </div>
+  </div>
+  </div>
+</html>

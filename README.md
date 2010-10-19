@@ -26,7 +26,7 @@ The chat room and its associated server have the following dependencies:
 
 ## Instruments ##
 
-Instruments only need to include one file, [kitchen-party.js][], which automatically pulls in `jschannel` and uses it to communicate with the parent chat room. See [example-instrument.html][] for sample code.
+Instruments only need to include one file, [kitchen-party.js][], which automatically pulls in `jschannel` and uses it to communicate with the parent chat room. See [examples/highlight.html][] for sample code.
 
   [kitchen-party.js]: http://github.com/toolness/kitchen-party/blob/master/static-files/kitchen-party.js
-  [example-instrument.html]: http://github.com/toolness/kitchen-party/blob/master/static-files/example-instrument.html
+  [examples/highlight.html]: http://github.com/toolness/kitchen-party/blob/master/static-files/examples/highlight.html
