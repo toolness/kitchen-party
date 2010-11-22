@@ -21,8 +21,8 @@ function errorMessage(className) {
 
 function addMessage(query) {
   $("#messages").append(query);
-  var height = $(document.body).height();
-  $(document.body).scrollTop(height);
+  //var height = $("#messages").height();
+  $("#messages").scrollTop(999999);
 }
 
 function Instrument(where, id, url, state, send) {
@@ -297,6 +297,11 @@ body {
   font-family: Futura;
 }
 
+#messages {
+  height: 20em;
+  overflow: auto;
+}
+
 #templates {
   display: none;
 }
@@ -339,16 +344,16 @@ pre {
 }
 </style>
 <h1>Kitchen Party</h1>
+<div id="instruments"></div>
 <div id="messages">
 </div>
 <div id="prompt">
   <form>&gt; <input type="text"></form>
 </div>
-<div id="instruments"></div>
 <div id="templates">
   <div class="instrument">
     <div class="content"></div>
-    <div class="controls"><span class="close"></span></div>
+    <!-- <div class="controls"><span class="close"></span></div> -->
   </div>
   <span class="you">you</span>
   <span class="other">number <span class="user-id"></span></span>
